@@ -24,7 +24,7 @@ def parse(sam):
             except AttributeError:
                 depths[base.pos] += len(base.pileups)
         df = pandas.DataFrame(depths, index=numpy.arange(length + 1), columns=["depth"])
-        yield chromo, length, pandas.rolling_mean(df, window=RES)
+        yield chromo, length, df.rolling(window=RES).mean()
 
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
@@ -53,10 +53,10 @@ if __name__ == "__main__":
             all_depths.extend(counts[counts.columns[0]][::SKIP])
 
     # print normalized median coverages for aneuploidy analysis
-    print "chromosome\tnormalized_coverage"
+    print ("chromosome\tnormalized_coverage")
     for chromo in sam.references:
-        if medians.has_key(chromo):
-            print "%s\t%.4f" % (chromo, medians[chromo] / numpy.median(all_depths))
+        if medians.__contains__(chromo):
+            print ("%s\t%.4f" % (chromo, medians[chromo] / numpy.median(all_depths)))
 
     # draw some reference lines for identifying common aneuploidies
     for mult, color, label in [(1.5, '--', "2N (+/-1)"),
